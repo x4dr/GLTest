@@ -62,13 +62,13 @@ program['position'] = np.c_[
     np.array(xcor),
     np.array(ycor)].astype(np.float32)
 
-r = np.arange(0, 1, 1 / 6)
-g = np.arange(0, 1, 1 / 6)
-b = np.arange(0, 1, 1)
+r = np.zeros(12)
+g = np.arange(0, 1, 1 / 12)
+b = np.arange(0, 1, 1/12)
 
-r = np.repeat(r, 2 * tiles)
-g = np.repeat(g, 2 * tiles)
-b = np.repeat(b, 12 * tiles)
+r = np.tile(r, tiles)
+g = np.tile(g,  tiles)
+b = np.tile(b, tiles)
 
 program['color'] = np.c_[
     r,
