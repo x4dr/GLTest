@@ -23,9 +23,13 @@ fragment = """
         gl_FragColor = v_color;
     } """
 
-tiles = 6
-loffs = int(np.sqrt(tiles))
+xsize = 5
+ysize = 7
+tiles = xsize * ysize*2
+
+loffs = xsize
 print(loffs)
+print(tiles)
 linewidth = int(tiles / loffs)
 hexx = []
 hexy = []
@@ -40,50 +44,31 @@ ycor = np.tile(hexy, tiles)
 
 xcor = np.reshape(xcor, (-1, loffs, 12))
 ycor = np.reshape(ycor, (-1, loffs, 12))
-print(xcor)
-print("\n\n\n\n\n\n\n\n\n")
 
 for line in range(len(xcor)):
     for hexf in range(len(xcor[line])):
         for i in range(len(xcor[line][hexf])):
-            xcor[line][hexf][i] += hexf
-
-print(xcor)
-print("\n\n\n\n\n\n\n\n\n")
+            xcor[line][hexf][i] += hexf * 3 + -0.75 * ((-1) ** line)
 
 for line in range(len(ycor)):
     for hexf in range(len(ycor[line])):
         for i in range(len(ycor[line][hexf])):
-            ycor[line][hexf][i] += hexf
+            ycor[line][hexf][i] += line * np.sin(np.pi / 3)
 
+xcor = np.add(xcor.flat, -0.5 - xsize)
 
-yloffs = np.repeat(np.arange(loffs), 12 + linewidth * 12)
-yloffs = yloffs * 2 * np.sin(np.pi / 3)
-yloffs = np.split(yloffs, [12 * tiles])[0]
-
-yoffs = np.append(np.zeros(12), np.ones(12)) * np.sin(np.pi / 3)
-yoffs = np.tile(yoffs, int(1 + tiles / 2))
-yoffs = np.split(yoffs, [12 * tiles])[0]
-# yoffs = yoffs * alternate
-yoffs = np.add(yoffs, yloffs)
-
-xoffs = np.tile(np.repeat(np.arange(1 + linewidth), 12), loffs)
-xoffs = np.add(xoffs, 0.5 - np.sqrt(tiles / 2.0))
-xoffs = np.split(xoffs, [12 * tiles])[0]
-
-xcor = np.add(xoffs * 1.5, xcor)
-ycor = np.add(yoffs, ycor + 0.5 - np.sqrt(tiles / 2.0))
+ycor = np.add(ycor.flat,1.2- ysize)
 program['position'] = np.c_[
     np.array(xcor),
     np.array(ycor)].astype(np.float32)
 
-r = np.arange(0, 1, (1 / 12))
-g = np.arange(0, 1, (1 / 12))
-b = np.arange(0, 1, (1 / 12))
+r = np.arange(0, 1, 1 / 6)
+g = np.arange(0, 1, 1 / 6)
+b = np.arange(0, 1, 1)
 
-r = np.repeat(r, tiles)
-g = np.repeat(g, tiles)
-b = np.repeat(b, tiles)
+r = np.repeat(r, 2 * tiles)
+g = np.repeat(g, 2 * tiles)
+b = np.repeat(b, 12 * tiles)
 
 program['color'] = np.c_[
     r,
@@ -105,7 +90,8 @@ def on_resize(event):
         y = (height - width) / 2
         w = h = width
     gloo.set_viewport(x, y, w, h)
-    gloo.set_viewport(0, 0, *event.size)
+
+   # gloo.set_viewport(0, 0, *event.size)
 
 
 @c.connect
